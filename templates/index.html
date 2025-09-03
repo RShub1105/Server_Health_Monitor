@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>🚀 Server Health Dashboard</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      background: #f5f7fa;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+    }
+    .card {
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .stat-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    .progress {
+      height: 12px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .status-good { background: #198754; }
+    .status-warn { background: #fd7e14; }
+    .status-bad  { background: #dc3545; }
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      color: #6c757d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-4">
+    <h1 class="text-center mb-4">🖥️ Server Health Dashboard</h1>
+
+    <!-- Stats Grid -->
+    <div class="row g-4">
+      <div class="col-md-3">
+        <div class="card text-center p-3">
+          <i class="fas fa-microchip text-primary stat-icon"></i>
+          <h5>CPU Usage</h5>
+          <h2 id="cpu">--%</h2>
+          <div class="progress">
+            <div id="cpu-bar" class="progress-bar" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center p-3">
+          <i class="fas fa-memory text-success stat-icon"></i>
+          <h5>Memory</h5>
+          <h2 id="memory">--%</h2>
+          <div class="progress">
+            <div id="memory-bar" class="progress-bar" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center p-3">
+          <i class="fas fa-hdd text-warning stat-icon"></i>
+          <h5>Disk</h5>
+          <h2 id="disk">--%</h2>
+          <div class="progress">
+            <div id="disk-bar" class="progress-bar" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center p-3">
+          <i class="fas fa-clock text-danger stat-icon"></i>
+          <h5>Uptime</h5>
+          <h2 id="uptime">--</h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="row mt-5">
+      <div class="col-md-12">
+        <div class="card p-4">
+          <h4 class="mb-3">📊 Usage Trends</h4>
+          <canvas id="usageChart" height="500"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>⚡ Built with Flask, Chart.js & Bootstrap</p>
+  </footer>
+
+  <script>
+     const ctx = document.getElementById('usageChart').getContext('2d');
+  const usageChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        {
+          label: 'CPU %',
+          data: [],
+          borderColor: '#0d6efd',
+          borderWidth: 5,        // thicker blue line
+          pointRadius: 6,        // larger points
+          pointHoverRadius: 8,
+          tension: 0.4           // smooth curve
+        },
+        {
+          label: 'Memory %',
+          data: [],
+          borderColor: '#198754',
+          borderWidth: 5,        // thicker green line
+          pointRadius: 6,
+          pointHoverRadius: 8,
+          tension: 0.4
+        },
+        {
+          label: 'Disk %',
+          data: [],
+          borderColor: '#fd7e14',
+          borderWidth: 5,        // thicker orange line
+          pointRadius: 6,
+          pointHoverRadius: 8,
+          tension: 0.4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      animation: { duration: 0 },
+      elements: {
+        line: { fill: false }
+      },
+      scales: {
+        x: {
+          ticks: {
+            maxTicksLimit: 6,   // fewer labels = more space between points
+            font: { size: 14 }
+          }
+        },
+        y: {
+          beginAtZero: true,
+          max: 100,
+          ticks: { font: { size: 14 } }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: { font: { size: 16 } }
+        }
+      }
+    }
+  });
+
+    async function fetchMetrics() {
+      const res = await fetch("/metrics");
+      const data = await res.json();
+
+      updateCard("cpu", data.cpu, "cpu-bar");
+      updateCard("memory", data.memory, "memory-bar");
+      updateCard("disk", data.disk, "disk-bar");
+
+      document.getElementById("uptime").textContent = formatUptime(data.uptime);
+
+      const ts = new Date().toLocaleTimeString();
+      usageChart.data.labels.push(ts);
+      usageChart.data.datasets[0].data.push(data.cpu);
+      usageChart.data.datasets[1].data.push(data.memory);
+      usageChart.data.datasets[2].data.push(data.disk);
+
+      if (usageChart.data.labels.length > 20) {
+        usageChart.data.labels.shift();
+        usageChart.data.datasets.forEach(d => d.data.shift());
+      }
+      usageChart.update();
+    }
+
+    function updateCard(id, value, barId) {
+      const el = document.getElementById(id);
+      el.textContent = value + "%";
+      const bar = document.getElementById(barId);
+      bar.style.width = value + "%";
+      bar.className = "progress-bar";
+
+      if (value < 50) bar.classList.add("status-good");
+      else if (value < 80) bar.classList.add("status-warn");
+      else bar.classList.add("status-bad");
+    }
+
+    function formatUptime(seconds) {
+      const h = Math.floor(seconds / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      return `${h}h ${m}m`;
+    }
+
+    setInterval(fetchMetrics, 2000);
+    fetchMetrics();
+  </script>
+</body>
+</html>
