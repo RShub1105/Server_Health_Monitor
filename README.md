@@ -19,7 +19,9 @@ It gives you a clean, modern, and interactive way to track your **CPU, Memory, D
 ✅ **Email & Slack notifications** – configurable alerts for high usage  
 ✅ **Lightweight & Dockerized** – easy to run anywhere  
 ✅ **Kubernetes-ready** – deployable on any K8s cluster
+
 ✅ **CI/CD with GitHub Actions** – automated testing & Docker builds
+
 ✅ **Extensible logging pipeline** – Logstash + Elasticsearch + Prometheus
 
 ---
