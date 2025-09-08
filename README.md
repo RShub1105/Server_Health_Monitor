@@ -4,6 +4,9 @@ A **real-time system monitoring dashboard** built with **Flask, psutil, Chart.js
 It gives you a clean, modern, and interactive way to track your **CPU, Memory, Disk usage, and Uptime** — all in one place.  
 
 ![Dashboard Preview](Screenshot.png)
+## 🔎 Project Architecture
+![Architecture Flowchart](Flowchat_diagram.png)
+
 
 ---
 
@@ -15,6 +18,9 @@ It gives you a clean, modern, and interactive way to track your **CPU, Memory, D
 ✅ **Responsive UI** – works on desktop, tablet, and mobile  
 ✅ **Email & Slack notifications** – configurable alerts for high usage  
 ✅ **Lightweight & Dockerized** – easy to run anywhere  
+✅ **Kubernetes-ready** – deployable on any K8s cluster
+✅ **CI/CD with GitHub Actions** – automated testing & Docker builds
+✅ **Extensible logging pipeline** – Logstash + Elasticsearch + Prometheus
 
 ---
 
@@ -24,28 +30,36 @@ It gives you a clean, modern, and interactive way to track your **CPU, Memory, D
 - **Frontend:** Bootstrap 5, Chart.js, Font Awesome  
 - **Alerts:** SMTP (Email), Slack Webhooks  
 - **Deployment:** Docker, Gunicorn-ready  
-
+- **Monitoring:** Prometheus, Logstash, Elasticsearch
 ---
 
 ## 📂 Project Structure  
 
 Server-Health-Dashboard/
-│── 01.App.py # Flask backend (API + routes)
-
-│── monitor.py # System stats collection & logging
-
-│── alert.py # Email & Slack alerts
-
-│── requirements.txt # Python dependencies
-
-│── Dockerfile # Containerized deployment
-
+│── 01.App.py              # Flask backend
+│── monitor.py             # System stats collection & logging
+│── alert.py               # Alerts (Email + Slack)
+│── test_app.py            # Unit tests
+│── requirements.txt       # Python dependencies
+│── Dockerfile             # Container image build
+│── .github/
+│   └── workflows/
+│       └── ci-cd.yml      # GitHub Actions CI/CD pipeline
+│── kubernetes/
+│   ├── deployment.yaml    # Kubernetes Deployment + Service
+│   └── prometheus.yml     # Prometheus scrape config
+│── logstash/
+│   └── logstash.conf      # Logstash pipeline config
+│── terraform/
+│   └── main.tf            # AWS Terraform config
 │── templates/
-│ └── index.html # Main dashboard UI
-│── assets/
-│ └── dashboard_preview.png
+│   └── index.html         # Dashboard UI
 │── logs/
-│ └── system_log.txt # (auto-generated logs)
+│   └── system_log.txt     # Auto-generated log file
+│── assets/
+│   └── dashboard_preview.png
+│── README.md              # Documentation
+
 
 
 ---
@@ -67,7 +81,15 @@ python 01.App.py
 
 ## 🐳 Run with Docker
 docker build -t server-health-dashboard .
+
 docker run -p 8080:8080 server-health-dashboard
+
+## ☸️ Deploy on Kubernetes
+kubectl apply -f kubernetes/deployment.yaml
+
+kubectl get svc monitoring-app-service
+
+
 
 ## 🔔 Alerts Setup
 ### 📩 Email Alerts
@@ -93,6 +115,38 @@ SLACK_WEBHOOK = "https://hooks.slack.com/services/XXXX/XXXX/XXXX"
 - 🌓 Dark mode toggle
 
 - 🌐 Remote server monitoring support
+
+## 📊 Monitoring Stack
+
+- Prometheus – Scrapes metrics from the Flask app
+
+- Logstash – Forwards logs to Elasticsearch
+
+- Elasticsearch – Stores system metrics
+
+- Kibana (optional) – Visualize logs/metrics
+
+Configs:
+
+-  kubernetes/prometheus.yml – Prometheus scraping
+
+- logstash/logstash.conf – Logstash pipeline
+
+## 🛠️ CI/CD
+
+- Linting (flake8, mypy)
+
+- Unit tests (pytest)
+
+- Docker image build
+
+- Automated via GitHub Actions (.github/workflows/ci-cd.yml)
+
+🌐 Terraform (AWS S3 Logging)
+ 
+- cd terraform
+- terraform init
+- terraform apply
 
 
 ## 🤝 Contributing

@@ -1,6 +1,4 @@
 from flask import Flask, render_template, jsonify
-from monitor import get_system_stats
-from alert import send_email,send_slack
 import psutil
 import time
 
