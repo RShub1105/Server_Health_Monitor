@@ -39,25 +39,37 @@ It gives you a clean, modern, and interactive way to track your **CPU, Memory, D
 
 Server-Health-Dashboard/
 │── 01.App.py              # Flask backend
+
 │── monitor.py             # System stats collection & logging
+
 │── alert.py               # Alerts (Email + Slack)
+
 │── test_app.py            # Unit tests
+
 │── requirements.txt       # Python dependencies
+
 │── Dockerfile             # Container image build
+
 │── .github/
 │   └── workflows/
 │       └── ci-cd.yml      # GitHub Actions CI/CD pipeline
+
 │── kubernetes/
 │   ├── deployment.yaml    # Kubernetes Deployment + Service
 │   └── prometheus.yml     # Prometheus scrape config
+
 │── logstash/
 │   └── logstash.conf      # Logstash pipeline config
+
 │── terraform/
 │   └── main.tf            # AWS Terraform config
+
 │── templates/
 │   └── index.html         # Dashboard UI
+
 │── logs/
 │   └── system_log.txt     # Auto-generated log file
+
 │── assets/
 │   └── dashboard_preview.png
 │── README.md              # Documentation
