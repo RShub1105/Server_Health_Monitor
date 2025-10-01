@@ -1,6 +1,7 @@
 import os
 import sys
-import requests, smtplib
+import requests
+import smtplib
 from email.mime.text import MIMEText
 
 SLACK_WEBHOOK = ""  # Add Slack webhook
