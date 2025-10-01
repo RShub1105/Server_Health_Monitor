@@ -12,5 +12,6 @@ def get_system_stats():
 def log_stats(cpu, memory, disk, logfile="logs/system_log.txt"):
     with open(logfile, "a") as f:
         f.write(
-            f"{datetime.now()} | CPU={cpu}% | Memory={memory}% | Disk={disk}%\n"
+            f"{datetime.now()} | CPU={cpu}% | Memory={memory}% | "
+            f"Disk={disk}%\n"
         )
