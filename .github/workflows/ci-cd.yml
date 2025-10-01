@@ -24,6 +24,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest flake8 mypy
+          pip install types-psutil types-requests   # <-- added type stubs
 
       - name: Lint & Type Check
         run: |
